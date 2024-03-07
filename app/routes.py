@@ -1,53 +1,27 @@
-import os
-import uuid
-from flask import request, jsonify, send_from_directory
+from flask import request, jsonify
+import cloudinary
 from . import app
-
-def generate_unique_filename(filename):
-    # Get the file extension
-    _, extension = os.path.splitext(filename)
-
-    # Generate a unique identifier using uuid
-    unique_id = str(uuid.uuid4())
-
-    # Concatenate the unique_id and extension to create a unique filename
-    unique_filename = f"{unique_id}{extension}"
-
-    return unique_filename
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-@app.route('/')
-def index():
-    return "Hello, this is the static delivery server"
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
+    # Check if Authorization header is present
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Extract token from Authorization header
+    token = auth_header.split(' ')[1]
 
-    file = request.files['file']
+    # Here, you can validate the token, for example, using JWT or any other method
+    ## NO ACTUAL VALIDATION.
+    if token is '':
+        return jsonify({"error": "Unauthorized"}), 401
 
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'})
-
-    if file and allowed_file(file.filename):
-        # Generate a unique filename
-        unique_filename = generate_unique_filename(file.filename)
-
-        # Save the file with the unique filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-        return jsonify({'success': True, 'filename': unique_filename})
+    file_to_upload = request.files['file']
+    if file_to_upload:
+        # Upload file to Cloudinary
+        result = cloudinary.uploader.upload(file_to_upload)
+        return jsonify({"public_id": result['public_id'], "url": result['secure_url']})
     else:
-        return jsonify({'error': 'File type not allowed'})
+        return jsonify({"error": "No file provided"}), 400
 
-@app.route('/uploads/<filename>', methods=['GET'])
-def get_file(filename):
-    return send_from_directory(
-        app.config['UPLOAD_FOLDER'], filename
-    )
-
-if __name__ == '__main__':
-    app.run(debug=True)

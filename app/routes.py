@@ -2,6 +2,10 @@ from flask import request, jsonify
 import cloudinary
 from . import app
 
+@app.route('/')
+def hello():
+    return 'Hello'
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # Check if Authorization header is present

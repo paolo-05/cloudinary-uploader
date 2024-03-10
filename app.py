@@ -46,6 +46,3 @@ def upload_file():
         return jsonify({"url": result['secure_url']})
     else:
         return jsonify({"error": "No file provided"}), 400
-
-if(__name__ == '__main__'):
-    app.run()

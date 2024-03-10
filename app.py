@@ -19,27 +19,30 @@ cloudinary.config(
 app = Flask(__name__)
 cors = CORS(app)
 
-
-@app.route('/')
-def hello():
-    return 'Hello'
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    """Endpoint that handles upload from ckeditor to cloudinary.
+
+    Returns:
+        url: where the file is on cloudinary.
+    """
+
+    ###### AUTH CHEK
     # Check if Authorization header is present
-    auth_header = request.headers.get('Authorization')
-    if not auth_header or not auth_header.startswith('Bearer'):
-        return jsonify({"error": "Unauthorized"}), 401
-    
-    # Extract token from Authorization header
-    token = auth_header.split(' ')[1]
+    # auth_header = request.headers.get('Authorization')
+    # if not auth_header or not auth_header.startswith('Bearer'):
+    #     return jsonify({"error": "Unauthorized"}), 401
+    # # Extract token from Authorization header
+    # token = auth_header.split(' ')[1]
 
-    # Here, you can validate the token, for example, using JWT or any other method
-    ## NO ACTUAL VALIDATION.
-    if token == '':
-        return jsonify({"error": "Unauthorized"}), 401
+    # # Here, you can validate the token, for example, using JWT or any other method
+    # ## NO ACTUAL VALIDATION.
+    # if token == '':
+    #     return jsonify({"error": "Unauthorized"}), 401
 
-    file_to_upload = request.files['file']
+    ###### END AUTH CHECK
+
+    file_to_upload = request.files['upload']
     if file_to_upload:
         # Upload file to Cloudinary
         result = cloudinary.uploader.upload(file_to_upload)

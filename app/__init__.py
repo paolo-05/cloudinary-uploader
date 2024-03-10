@@ -32,7 +32,7 @@ def upload_file():
         return jsonify({"error": "Unauthorized"}), 401
     
     # Extract token from Authorization header
-    token = auth_header.split(': ')[1]
+    token = auth_header.split(' ')[1]
 
     # Here, you can validate the token, for example, using JWT or any other method
     ## NO ACTUAL VALIDATION.
@@ -43,7 +43,7 @@ def upload_file():
     if file_to_upload:
         # Upload file to Cloudinary
         result = cloudinary.uploader.upload(file_to_upload)
-        return jsonify({"public_id": result['public_id'], "url": result['secure_url']})
+        return jsonify({"url": result['secure_url']})
     else:
         return jsonify({"error": "No file provided"}), 400
 

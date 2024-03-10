@@ -1,5 +1,7 @@
 services:
   web:
+    env_file:
+      - .env
     build:
       context: .
     ports:

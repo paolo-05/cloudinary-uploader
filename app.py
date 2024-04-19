@@ -19,6 +19,15 @@ cloudinary.config(
 app = Flask(__name__)
 cors = CORS(app)
 
+@app.route('/', methods=['GET'])
+def index():
+    """Root endpoint.
+
+    Returns:
+       json: {"message": "OK"}
+    """
+    return jsonify({"message": "OK"})
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     """Endpoint that handles upload from ckeditor to cloudinary.
